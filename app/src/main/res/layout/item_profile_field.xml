@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/fieldIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_person"
+        app:tint="#185FA5"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvFieldLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#888780"
+            android:text="Họ và tên"/>
+
+        <EditText
+            android:id="@+id/etFieldValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:textSize="14sp"
+            android:textColor="#1A2744"
+            android:paddingTop="2dp"
+            android:paddingBottom="0dp"
+            android:singleLine="true"
+            android:hint="Nhập thông tin..."/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivFieldArrow"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="#BBBBBB"/>
+
+</LinearLayout>

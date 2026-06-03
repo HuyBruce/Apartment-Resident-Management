@@ -44,7 +44,10 @@ dependencies {
     implementation(libs.material)
 
     implementation("com.google.firebase:firebase-firestore:25.1.0")
+    implementation("com.google.firebase:firebase-auth:23.0.0")
 
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.google.android.material:material:1.11.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
