@@ -7,8 +7,8 @@ public class Resident {
     private String email;
     private String date_of_birth;
     private String gender;
-    private String apartment_number;   // thêm mới
-    private String members_count;      // thêm mới
+    private String apartment_number;
+    private String members_count;
 
     public Resident() {}
 
