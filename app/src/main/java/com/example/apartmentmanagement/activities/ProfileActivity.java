@@ -46,7 +46,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        if (getIntent().hasExtra("resident_id")) {
+            residentId = getIntent().getStringExtra("resident_id");
+        } else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             residentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
             residentId = "1";

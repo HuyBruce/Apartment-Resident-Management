@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.apartmentmanagement.activities.ProfileActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -158,9 +159,11 @@ public class ResidentHomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "Tính năng Tiện ích đang phát triển", Toast.LENGTH_SHORT).show()
         );
 
-        navAccount.setOnClickListener(v ->
-                Toast.makeText(this, "Tính năng Tài khoản đang phát triển", Toast.LENGTH_SHORT).show()
-        );
+        navAccount.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("resident_id", String.valueOf(residentId));
+            startActivity(intent);
+        });
     }
 
     private void loadHomeData() {
