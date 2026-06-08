@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Hồ sơ"/>
+
+    <item
+        android:id="@+id/nav_fee"
+        android:icon="@drawable/ic_fee"
+        android:title="Phí"/>
+
+    <item
+        android:id="@+id/nav_visitor"
+        android:icon="@drawable/ic_visitor"
+        android:title="Khách"/>
+
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_history"
+        android:title="Lịch sử"/>
+
+</menu>

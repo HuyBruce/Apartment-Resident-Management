@@ -11,17 +11,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ApartmentManagement">
+
+        <!-- LoginActivity là màn hình đầu tiên -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity không cần LAUNCHER nữa -->
+        <activity android:name=".MainActivity"/>
+
+        <activity android:name=".activities.ProfileActivity"/>
         <activity
-            android:name=".activities.ProfileActivity"/>
+            android:name=".activities.FeeActivity"
+            android:windowSoftInputMode="adjustResize"/>
+
     </application>
 
 </manifest>
