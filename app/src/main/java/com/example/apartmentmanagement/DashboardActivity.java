@@ -263,7 +263,6 @@ public class DashboardActivity extends AppCompatActivity {
 
         db.collection("requests")
                 .whereEqualTo("resident_id", residentId)
-                .orderBy("created_at", Query.Direction.DESCENDING)
                 .limit(3)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {

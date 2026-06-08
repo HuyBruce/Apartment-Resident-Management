@@ -202,23 +202,33 @@
 
                     <!-- Full Name -->
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldName"/>
+                        android:id="@+id/fieldName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <!-- Phone -->
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldPhone"/>
+                        android:id="@+id/fieldPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <!-- Email -->
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldEmail"/>
+                        android:id="@+id/fieldEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <!-- DOB -->
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldDob"/>
+                        android:id="@+id/fieldDob"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <!-- Gender -->
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldGender"/>
+                        android:id="@+id/fieldGender"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -273,10 +283,14 @@
                     </LinearLayout>
 
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldApartment"/>
+                        android:id="@+id/fieldApartment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                     <include layout="@layout/item_profile_field"
-                        android:id="@+id/fieldMembers"/>
+                        android:id="@+id/fieldMembers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

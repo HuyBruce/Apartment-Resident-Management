@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Android 13+ cần quyền này để hiển thị notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -13,25 +17,39 @@
         android:theme="@style/Theme.ApartmentManagement">
 
         <activity
-            android:name=".LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".NotificationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CreateRequestActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RequestStatusActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ServiceActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ResidentHomeActivity"
             android:exported="false" />
 
         <activity
-            android:name=".DashboardActivity"
+            android:name=".activities.ProfileActivity"
             android:exported="false" />
 
         <activity
-            android:name=".activities.ProfileActivity"
-            android:exported="false" />
+            android:name=".LoginActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
 
     </application>
 

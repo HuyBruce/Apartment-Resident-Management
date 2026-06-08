@@ -19,6 +19,13 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class ResidentHomeActivity extends AppCompatActivity {
 
@@ -55,6 +62,8 @@ public class ResidentHomeActivity extends AppCompatActivity {
     private final Map<Integer, String> requestCategoryMap = new HashMap<>();
 
     private double totalUnpaidAmount = 0;
+    private float density;
+    private NumberFormat currencyFormatter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +71,13 @@ public class ResidentHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         db = FirebaseFirestore.getInstance();
+        density = getResources().getDisplayMetrics().density;
+        currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
         initViews();
         getIntentData();
         setupClickEvents();
+        requestNotificationPermission();
         loadHomeData();
     }
 
@@ -111,59 +123,69 @@ public class ResidentHomeActivity extends AppCompatActivity {
     }
 
     private void setupClickEvents() {
-        btnInvoice.setOnClickListener(v ->
-                Toast.makeText(this, "Mở màn hình hóa đơn", Toast.LENGTH_SHORT).show()
-        );
+        btnInvoice.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RequestStatusActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
 
-        btnRequest.setOnClickListener(v ->
-                Toast.makeText(this, "Mở màn hình gửi yêu cầu", Toast.LENGTH_SHORT).show()
-        );
+        btnRequest.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CreateRequestActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
 
         btnMember.setOnClickListener(v ->
-                Toast.makeText(this, "Mở màn hình thành viên căn hộ", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Chức năng thành viên sẽ làm sau", Toast.LENGTH_SHORT).show()
         );
 
-        btnChat.setOnClickListener(v ->
-                Toast.makeText(this, "Mở chat ban quản lý", Toast.LENGTH_SHORT).show()
-        );
+        btnChat.setOnClickListener(v -> {
+            Intent intent = new Intent(this, NotificationsActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
 
         tvViewAllFees.setOnClickListener(v ->
-                Toast.makeText(this, "Xem tất cả hóa đơn", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Chức năng quản lý phí sẽ làm ở phần 7", Toast.LENGTH_SHORT).show()
         );
 
-        tvViewAllRequests.setOnClickListener(v ->
-                Toast.makeText(this, "Xem tất cả yêu cầu", Toast.LENGTH_SHORT).show()
-        );
+        tvViewAllRequests.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RequestStatusActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
+
+        navUtilities.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ServiceActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
+
+        navAccount.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ProfileActivity.class);
+            putUserData(intent);
+            startActivity(intent);
+        });
 
         btnPay.setOnClickListener(v -> {
             if (totalUnpaidAmount <= 0) {
                 Toast.makeText(this, "Không có hóa đơn cần thanh toán", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Thanh toán: " + formatCurrency(totalUnpaidAmount), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Chức năng thanh toán sẽ làm ở phần 8", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        navHome.setOnClickListener(v ->
-                Toast.makeText(this, "Bạn đang ở trang chủ", Toast.LENGTH_SHORT).show()
-        );
+    private void putUserData(Intent intent) {
+        intent.putExtra("user_id", userId);
+        intent.putExtra("resident_id", residentId);
+        intent.putExtra("apartment_id", apartmentId);
 
-        navProperty.setOnClickListener(v -> {
-            Intent intent = new Intent(this, DashboardActivity.class);
-            intent.putExtra("user_id", userId);
-            intent.putExtra("resident_id", residentId);
-            intent.putExtra("apartment_id", apartmentId);
-            startActivity(intent);
-        });
+        String fullName = getIntent().getStringExtra("full_name");
+        String role = getIntent().getStringExtra("role");
 
-        navUtilities.setOnClickListener(v ->
-                Toast.makeText(this, "Tính năng Tiện ích đang phát triển", Toast.LENGTH_SHORT).show()
-        );
-
-        navAccount.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("resident_id", String.valueOf(residentId));
-            startActivity(intent);
-        });
+        intent.putExtra("full_name", fullName);
+        intent.putExtra("role", role);
     }
 
     private void loadHomeData() {
@@ -259,7 +281,6 @@ public class ResidentHomeActivity extends AppCompatActivity {
         db.collection("fees")
                 .whereEqualTo("apartment_id", apartmentId)
                 .whereEqualTo("status", "unpaid")
-                .orderBy("due_date", Query.Direction.ASCENDING)
                 .limit(5)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -334,7 +355,6 @@ public class ResidentHomeActivity extends AppCompatActivity {
 
         db.collection("requests")
                 .whereEqualTo("resident_id", residentId)
-                .orderBy("created_at", Query.Direction.DESCENDING)
                 .limit(5)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -542,11 +562,27 @@ public class ResidentHomeActivity extends AppCompatActivity {
     }
 
     private String formatCurrency(double amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        return formatter.format(amount);
+        if (currencyFormatter == null) {
+            currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        }
+        return currencyFormatter.format(amount);
     }
 
     private int dpToPx(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
+        return Math.round(dp * density);
+    }
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        100
+                );
+            }
+        }
     }
 }

@@ -46,12 +46,23 @@ public class ProfileActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        // Get resident ID from intent (can be int or String)
         if (getIntent().hasExtra("resident_id")) {
-            residentId = getIntent().getStringExtra("resident_id");
-        } else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            residentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        } else {
-            residentId = "1";
+            int intId = getIntent().getIntExtra("resident_id", -1);
+            if (intId != -1) {
+                residentId = String.valueOf(intId);
+            } else {
+                residentId = getIntent().getStringExtra("resident_id");
+            }
+        }
+
+        // Fallback to Firebase Auth or default
+        if (residentId == null) {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                residentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            } else {
+                residentId = "1";
+            }
         }
 
         setupToolbar();
@@ -74,6 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void bindViews() {
         rootView = findViewById(android.R.id.content);
         tvName = findViewById(R.id.tvName);
+        tvStatus = findViewById(R.id.tvStatus);
         tvApartmentChip = findViewById(R.id.tvApartmentChip);
 
         etName   = findViewById(R.id.fieldName).findViewById(R.id.etFieldValue);
@@ -87,13 +99,13 @@ public class ProfileActivity extends AppCompatActivity {
         etMembers   = findViewById(R.id.fieldMembers).findViewById(R.id.etFieldValue);
 
         // Set labels
-        setFieldLabel(R.id.fieldName,      com.google.android.material.R.drawable.ic_m3_chip_close,  "Họ và tên");
-        setFieldLabel(R.id.fieldPhone,     android.R.drawable.ic_menu_call,     "Số điện thoại");
-        setFieldLabel(R.id.fieldEmail,     android.R.drawable.ic_dialog_email,  "Email");
-        setFieldLabel(R.id.fieldDob,       android.R.drawable.ic_menu_today,    "Ngày sinh");
-        setFieldLabel(R.id.fieldGender,    android.R.drawable.ic_menu_myplaces, "Giới tính");
-        setFieldLabel(R.id.fieldApartment, android.R.drawable.ic_menu_compass,  "Số căn hộ");
-        setFieldLabel(R.id.fieldMembers,   android.R.drawable.ic_menu_manage,   "Số thành viên");
+        setFieldLabel(R.id.fieldName,      R.drawable.ic_person,                "Họ và tên");
+        setFieldLabel(R.id.fieldPhone,     R.drawable.ic_phone,                 "Số điện thoại");
+        setFieldLabel(R.id.fieldEmail,     R.drawable.ic_email,                 "Email");
+        setFieldLabel(R.id.fieldDob,       R.drawable.ic_calendar,              "Ngày sinh");
+        setFieldLabel(R.id.fieldGender,    R.drawable.ic_gender,                "Giới tính");
+        setFieldLabel(R.id.fieldApartment, R.drawable.ic_building,              "Số căn hộ");
+        setFieldLabel(R.id.fieldMembers,   R.drawable.ic_group,                 "Số thành viên");
         btnSave = findViewById(R.id.btnSave);
         btnLoad = findViewById(R.id.btnLoad);
     }
