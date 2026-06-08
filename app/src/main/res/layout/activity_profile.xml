@@ -103,7 +103,6 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="?attr/homeAsUpIndicator"
-                app:title="Hồ sơ cư dân"
                 app:titleTextColor="#FFFFFF"/>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -219,6 +218,9 @@
                     <!-- Gender -->
                     <include layout="@layout/item_profile_field"
                         android:id="@+id/fieldGender"/>
+
+                    <include layout="@layout/item_profile_field"
+                        android:id="@+id/fieldIdentity"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

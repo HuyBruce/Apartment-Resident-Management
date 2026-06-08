@@ -5,8 +5,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
+import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -25,9 +24,9 @@ public class ProfileActivity extends AppCompatActivity {
     // Header views
     private TextView tvName, tvStatus, tvApartmentChip;
 
-    // Field EditTexts (from included layouts)
+    // Field EditTexts
     private EditText etName, etPhone, etEmail, etDob, etGender;
-    private EditText etApartment, etMembers;
+    private EditText etApartment, etMembers, etIdentity;
 
     // Buttons
     private MaterialButton btnSave, btnLoad;
@@ -46,11 +45,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            residentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        } else {
-            residentId = "1";
-        }
+        // Giữ residentId rỗng, sẽ được set trong loadProfile()
+        residentId = "";
 
         setupToolbar();
         bindViews();
@@ -74,24 +70,25 @@ public class ProfileActivity extends AppCompatActivity {
         tvName = findViewById(R.id.tvName);
         tvApartmentChip = findViewById(R.id.tvApartmentChip);
 
-        etName   = findViewById(R.id.fieldName).findViewById(R.id.etFieldValue);
-        etPhone  = findViewById(R.id.fieldPhone).findViewById(R.id.etFieldValue);
-        etEmail  = findViewById(R.id.fieldEmail).findViewById(R.id.etFieldValue);
-        etDob    = findViewById(R.id.fieldDob).findViewById(R.id.etFieldValue);
-        etGender = findViewById(R.id.fieldGender).findViewById(R.id.etFieldValue);
-
-        // Apartment fields
+        etName     = findViewById(R.id.fieldName).findViewById(R.id.etFieldValue);
+        etPhone    = findViewById(R.id.fieldPhone).findViewById(R.id.etFieldValue);
+        etEmail    = findViewById(R.id.fieldEmail).findViewById(R.id.etFieldValue);
+        etDob      = findViewById(R.id.fieldDob).findViewById(R.id.etFieldValue);
+        etGender   = findViewById(R.id.fieldGender).findViewById(R.id.etFieldValue);
+        etIdentity = findViewById(R.id.fieldIdentity).findViewById(R.id.etFieldValue);
         etApartment = findViewById(R.id.fieldApartment).findViewById(R.id.etFieldValue);
         etMembers   = findViewById(R.id.fieldMembers).findViewById(R.id.etFieldValue);
 
         // Set labels
-        setFieldLabel(R.id.fieldName,      com.google.android.material.R.drawable.ic_m3_chip_close,  "Họ và tên");
+        setFieldLabel(R.id.fieldName,      com.google.android.material.R.drawable.ic_m3_chip_close, "Họ và tên");
         setFieldLabel(R.id.fieldPhone,     android.R.drawable.ic_menu_call,     "Số điện thoại");
         setFieldLabel(R.id.fieldEmail,     android.R.drawable.ic_dialog_email,  "Email");
         setFieldLabel(R.id.fieldDob,       android.R.drawable.ic_menu_today,    "Ngày sinh");
         setFieldLabel(R.id.fieldGender,    android.R.drawable.ic_menu_myplaces, "Giới tính");
+        setFieldLabel(R.id.fieldIdentity,  android.R.drawable.ic_menu_edit,     "Số CCCD");
         setFieldLabel(R.id.fieldApartment, android.R.drawable.ic_menu_compass,  "Số căn hộ");
         setFieldLabel(R.id.fieldMembers,   android.R.drawable.ic_menu_manage,   "Số thành viên");
+
         btnSave = findViewById(R.id.btnSave);
         btnLoad = findViewById(R.id.btnLoad);
     }
@@ -102,22 +99,81 @@ public class ProfileActivity extends AppCompatActivity {
         ((ImageView) field.findViewById(R.id.fieldIcon)).setImageResource(iconRes);
     }
 
+    // ── Stat cards ──────────────────────────────────────────────────────────────
+    private void setStatCard(int cardId, String value, String label) {
+        View card = findViewById(cardId);
+        if (card == null) return;
+        ((TextView) card.findViewById(R.id.tvStatValue)).setText(value);
+        ((TextView) card.findViewById(R.id.tvStatLabel)).setText(label);
+    }
+
+    private void loadStatCards(String resId) {
+        // Đếm phí chưa đóng
+        db.collection("fees")
+                .whereEqualTo("resident_id", resId)
+                .whereEqualTo("status", "unpaid")
+                .get()
+                .addOnSuccessListener(snap ->
+                        setStatCard(R.id.statFee, String.valueOf(snap.size()), "Phí chưa đóng"));
+
+        // Đếm yêu cầu (sẽ dùng khi bạn kia làm module requests)
+        db.collection("requests")
+                .whereEqualTo("resident_id", resId)
+                .get()
+                .addOnSuccessListener(snap ->
+                        setStatCard(R.id.statRequest, String.valueOf(snap.size()), "Yêu cầu"));
+    }
+    // ────────────────────────────────────────────────────────────────────────────
+
     private void loadProfile() {
         btnLoad.setEnabled(false);
 
-        db.collection("residents")
-                .document(residentId)
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        Log.d("PROFILE", "Email đang dùng: " + email);
+
+        db.collection("users")
+                .whereEqualTo("email", email)
+                .limit(1)
                 .get()
-                .addOnSuccessListener(doc -> {
-                    btnLoad.setEnabled(true);
-                    if (doc.exists()) {
-                        Resident r = doc.toObject(Resident.class);
-                        if (r != null) populateFields(r);
+                .addOnSuccessListener(userQuery -> {
+                    Log.d("PROFILE", "Users found: " + userQuery.size());
+
+                    if (userQuery.isEmpty()) {
+                        btnLoad.setEnabled(true);
+                        showSnackbar("Không tìm thấy tài khoản.");
+                        return;
                     }
+
+                    Object residentIdObj = userQuery.getDocuments().get(0).get("resident_id");
+                    Log.d("PROFILE", "resident_id: " + residentIdObj);
+                    String resId = String.valueOf(residentIdObj);
+
+                    db.collection("residents")
+                            .document(resId)
+                            .get()
+                            .addOnSuccessListener(doc -> {
+                                Log.d("PROFILE", "Resident exists: " + doc.exists());
+                                btnLoad.setEnabled(true);
+                                if (doc.exists()) {
+                                    residentId = doc.getId();
+                                    Resident r = doc.toObject(Resident.class);
+                                    if (r != null) {
+                                        Log.d("PROFILE", "Name: " + r.getFull_name());
+                                        populateFields(r);
+                                        loadStatCards(residentId);
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("PROFILE", "Residents error: " + e.getMessage());
+                                btnLoad.setEnabled(true);
+                                showSnackbar("Không thể tải hồ sơ.");
+                            });
                 })
                 .addOnFailureListener(e -> {
+                    Log.d("PROFILE", "Users error: " + e.getMessage());
                     btnLoad.setEnabled(true);
-                    showSnackbar("Không thể tải hồ sơ. Thử lại sau.");
+                    showSnackbar("Lỗi kết nối.");
                 });
     }
 
@@ -132,8 +188,14 @@ public class ProfileActivity extends AppCompatActivity {
         etEmail.setText(r.getEmail());
         etDob.setText(r.getDate_of_birth());
         etGender.setText(r.getGender());
+        etIdentity.setText(r.getIdentity_number());
         etApartment.setText(r.getApartment_number());
         etMembers.setText(r.getMembers_count());
+
+        // Stat card vai trò
+        String role = r.getRelationship_to_apartment() != null
+                ? r.getRelationship_to_apartment() : "—";
+        setStatCard(R.id.statResidence, role, "Vai trò");
     }
 
     private void saveProfile() {
@@ -148,6 +210,7 @@ public class ProfileActivity extends AppCompatActivity {
         data.put("email",            etEmail.getText().toString().trim());
         data.put("date_of_birth",    etDob.getText().toString().trim());
         data.put("gender",           etGender.getText().toString().trim());
+        data.put("identity_number",  etIdentity.getText().toString().trim());
         data.put("apartment_number", etApartment.getText().toString().trim());
         data.put("members_count",    etMembers.getText().toString().trim());
 
@@ -157,7 +220,6 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(unused -> {
                     btnSave.setEnabled(true);
                     btnSave.setText("Lưu thay đổi");
-                    // Update header live
                     tvName.setText(etName.getText().toString().trim());
                     tvApartmentChip.setText("Căn hộ " + etApartment.getText().toString().trim());
                     showSnackbar("✓ Hồ sơ đã được cập nhật");
