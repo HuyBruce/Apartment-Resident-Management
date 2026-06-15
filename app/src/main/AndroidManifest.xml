@@ -21,23 +21,11 @@
             android:exported="false" />
 
         <activity
-            android:name=".CreateRequestActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".RequestStatusActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ServiceActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".ResidentHomeActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".activities.ProfileActivity"
             android:exported="false" />
 
         <activity

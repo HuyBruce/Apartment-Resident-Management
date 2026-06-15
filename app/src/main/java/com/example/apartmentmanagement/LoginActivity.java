@@ -95,10 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     Long userIdLong = userDoc.getLong("id");
-                    Long residentIdLong = userDoc.getLong("resident_id");
 
                     int userId = userIdLong != null ? userIdLong.intValue() : -1;
-                    int residentId = residentIdLong != null ? residentIdLong.intValue() : -1;
 
                     String fullName = userDoc.getString("full_name");
                     String role = userDoc.getString("role");
@@ -106,26 +104,13 @@ public class LoginActivity extends AppCompatActivity {
                     if (fullName == null) {
                         fullName = "";
                     }
-
-                    if (role == null) {
-                        role = "resident";
-                    }
-
-                    if ("resident".equals(role) && residentId == -1) {
+                    if (!"admin".equals(role)) {
                         showLoading(false);
-                        Toast.makeText(
-                                LoginActivity.this,
-                                "Tài khoản cư dân chưa liên kết hồ sơ cư dân",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        Toast.makeText(LoginActivity.this, "Ứng dụng này chỉ dành cho quản trị viên", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    if ("resident".equals(role)) {
-                        getApartmentIdAndOpenDashboard(userId, residentId, fullName, role);
-                    } else {
-                        openDashboard(userId, residentId, -1, fullName, role);
-                    }
+                    openDashboard(userId, fullName, role);
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
@@ -137,52 +122,14 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void getApartmentIdAndOpenDashboard(
-            int userId,
-            int residentId,
-            String fullName,
-            String role
-    ) {
-        db.collection("residents")
-                .document(String.valueOf(residentId))
-                .get()
-                .addOnSuccessListener(residentDoc -> {
-                    showLoading(false);
-
-                    int apartmentId = -1;
-
-                    if (residentDoc.exists()) {
-                        Long apartmentIdLong = residentDoc.getLong("apartment_id");
-
-                        if (apartmentIdLong != null) {
-                            apartmentId = apartmentIdLong.intValue();
-                        }
-                    }
-
-                    openDashboard(userId, residentId, apartmentId, fullName, role);
-                })
-                .addOnFailureListener(e -> {
-                    showLoading(false);
-                    Toast.makeText(
-                            LoginActivity.this,
-                            "Không lấy được thông tin căn hộ: " + e.getMessage(),
-                            Toast.LENGTH_SHORT
-                    ).show();
-                });
-    }
-
     private void openDashboard(
             int userId,
-            int residentId,
-            int apartmentId,
             String fullName,
             String role
     ) {
         Intent intent = new Intent(LoginActivity.this, ResidentHomeActivity.class);
 
         intent.putExtra("user_id", userId);
-        intent.putExtra("resident_id", residentId);
-        intent.putExtra("apartment_id", apartmentId);
         intent.putExtra("full_name", fullName);
         intent.putExtra("role", role);
 
