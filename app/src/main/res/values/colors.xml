@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="navy_primary">#1A2744</color>
+    <color name="status_paid">#2E7D32</color>
+    <color name="status_unpaid">#C62828</color>
     <color name="bg_page">#F0F3F8</color>
     <color name="primary_blue">#1A3C6E</color>
     <color name="text_primary">#1A1A2E</color>
     <color name="text_hint">#999999</color>
     <color name="text_light">#BBBBBB</color>
     <color name="nav_inactive">#CCCCCC</color>
-
     <color name="green_dark">#2E7D32</color>
     <color name="orange_dark">#E65100</color>
     <color name="purple_dark">#6B21A8</color>
     <color name="role_tag_text">#A8C8FF</color>
-
-    <!-- Badge colors -->
     <color name="badge_red_text">#C62828</color>
     <color name="badge_red_bg">#FFEBEE</color>
     <color name="badge_amber_text">#E65100</color>
     <color name="badge_amber_bg">#FFF8E1</color>
     <color name="badge_green_text">#1B5E20</color>
     <color name="badge_green_bg">#E8F5E9</color>
+
 </resources>
