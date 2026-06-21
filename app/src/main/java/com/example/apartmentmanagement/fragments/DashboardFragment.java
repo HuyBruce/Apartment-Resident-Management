@@ -133,7 +133,7 @@ public class DashboardFragment extends Fragment {
         // Card Khách → VisitorFragment
         rootView.findViewById(R.id.cardStatVisitor).setOnClickListener(v -> {
             BottomNavigationView nav = requireActivity().findViewById(R.id.bottomNav);
-            nav.setSelectedItemId(R.id.nav_visitor);
+            nav.setSelectedItemId(R.id.nav_services);
         });
 
         // Card Lịch sử → HistoryFragment
@@ -154,7 +154,7 @@ public class DashboardFragment extends Fragment {
 
         rootView.findViewById(R.id.quickVisitor).setOnClickListener(v -> {
             BottomNavigationView nav = requireActivity().findViewById(R.id.bottomNav);
-            nav.setSelectedItemId(R.id.nav_visitor);
+            nav.setSelectedItemId(R.id.nav_services);
         });
 
         // Quick Sự kiện → EventsFragment

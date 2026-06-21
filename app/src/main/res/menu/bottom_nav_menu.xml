@@ -1,23 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_dashboard"
-        android:icon="@drawable/ic_dashboard"
-        android:title="Tổng quan"/>
-    <item
-        android:id="@+id/nav_visitor"
-        android:icon="@drawable/ic_visitor"
-        android:title="Khách"/>
-    <item
-        android:id="@+id/nav_fee"
-        android:icon="@drawable/ic_fee"
-        android:title="Thanh toán"/>
-    <item
-        android:id="@+id/nav_household"
-        android:icon="@drawable/ic_group"
-        android:title="Gia đình"/>
-    <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person"
-        android:title="Tôi"/>
+    <item android:id="@+id/nav_dashboard"  android:icon="@drawable/ic_dashboard" android:title="Tổng quan"/>
+    <item android:id="@+id/nav_services"   android:icon="@drawable/ic_visitor"   android:title="Dịch vụ"/>
+    <item android:id="@+id/nav_fee"        android:icon="@drawable/ic_fee"       android:title="Thanh toán"/>
+    <item android:id="@+id/nav_household"  android:icon="@drawable/ic_group"     android:title="Gia đình"/>
+    <item android:id="@+id/nav_profile"    android:icon="@drawable/ic_person"    android:title="Tôi"/>
 </menu>

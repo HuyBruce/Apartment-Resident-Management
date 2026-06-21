@@ -1,19 +1,16 @@
 package com.example.apartmentmanagement.models;
 
+import com.example.apartmentmanagement.utils.PenaltyCalculator;
+
 public class Fee {
     private String id;
-    private String resident_id;  // ← quan trọng
+    private String resident_id;
     private String category;
     private String title;
     private String description;
     private long amount;
     private String due_date;
     private String status;
-    private double penalty_rate;
-    private int apartment_id;
-    private int category_id;
-    private int month;
-    private int year;
 
     public Fee() {}
 
@@ -41,26 +38,28 @@ public class Fee {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public double getPenalty_rate() { return penalty_rate; }
-    public void setPenalty_rate(double penalty_rate) { this.penalty_rate = penalty_rate; }
 
-    // Helper
     public boolean isOverdue() {
-        return "unpaid".equals(status) &&
-                com.example.apartmentmanagement.utils.PenaltyCalculator.getOverdueDays(due_date) > 0;
+        return "unpaid".equals(status) && PenaltyCalculator.getOverdueDays(due_date) > 0;
     }
 
     public int getOverdueDays() {
-        return com.example.apartmentmanagement.utils.PenaltyCalculator.getOverdueDays(due_date);
+        return PenaltyCalculator.getOverdueDays(due_date);
     }
 
     public long getPenaltyAmount() {
-        return com.example.apartmentmanagement.utils.PenaltyCalculator
-                .getPenaltyAmount(amount, getOverdueDays());
+        return PenaltyCalculator.getPenaltyAmount(amount, getOverdueDays());
     }
 
     public long getTotalAmount() {
-        return com.example.apartmentmanagement.utils.PenaltyCalculator
-                .getTotalAmount(amount, getOverdueDays());
+        return PenaltyCalculator.getTotalAmount(amount, getOverdueDays());
+    }
+
+    public String getDebtLevel() {
+        return PenaltyCalculator.getDebtLevel(getOverdueDays());
+    }
+
+    public String getReminderMessage() {
+        return PenaltyCalculator.getReminderMessage(getOverdueDays());
     }
 }
