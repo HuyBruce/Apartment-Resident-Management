@@ -12,8 +12,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.apartmentmanagement.activities.LoginActivity;
 import com.example.apartmentmanagement.fragments.DashboardFragment;
+import com.example.apartmentmanagement.fragments.EventsFragment;
 import com.example.apartmentmanagement.fragments.FeeFragment;
 import com.example.apartmentmanagement.fragments.HistoryFragment;
+import com.example.apartmentmanagement.fragments.HouseholdFragment;
 import com.example.apartmentmanagement.fragments.ProfileFragment;
 import com.example.apartmentmanagement.fragments.VisitorFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -25,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
 
     private Fragment dashboardFragment = new DashboardFragment();
-    private Fragment profileFragment   = new ProfileFragment();
-    private Fragment feeFragment       = new FeeFragment();
     private Fragment visitorFragment   = new VisitorFragment();
+    private Fragment feeFragment       = new FeeFragment();
+    private Fragment householdFragment = new HouseholdFragment();
+    private Fragment profileFragment   = new ProfileFragment();
+    private Fragment eventsFragment    = new EventsFragment();
     private Fragment historyFragment   = new HistoryFragment();
     private Fragment activeFragment;
 
@@ -35,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Kiểm tra đăng nhập
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             goToLogin();
             return;
@@ -45,10 +48,12 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer, historyFragment, "history").hide(historyFragment)
-                .add(R.id.fragmentContainer, visitorFragment, "visitor").hide(visitorFragment)
-                .add(R.id.fragmentContainer, feeFragment, "fee").hide(feeFragment)
-                .add(R.id.fragmentContainer, profileFragment, "profile").hide(profileFragment)
+                .add(R.id.fragmentContainer, historyFragment,   "history").hide(historyFragment)
+                .add(R.id.fragmentContainer, eventsFragment,    "events").hide(eventsFragment)
+                .add(R.id.fragmentContainer, householdFragment, "household").hide(householdFragment)
+                .add(R.id.fragmentContainer, visitorFragment,   "visitor").hide(visitorFragment)
+                .add(R.id.fragmentContainer, feeFragment,       "fee").hide(feeFragment)
+                .add(R.id.fragmentContainer, profileFragment,   "profile").hide(profileFragment)
                 .add(R.id.fragmentContainer, dashboardFragment, "dashboard")
                 .commit();
 
@@ -57,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if      (id == R.id.nav_dashboard) switchTo(dashboardFragment);
-            else if (id == R.id.nav_profile)   switchTo(profileFragment);
-            else if (id == R.id.nav_fee)       switchTo(feeFragment);
             else if (id == R.id.nav_visitor)   switchTo(visitorFragment);
-            else if (id == R.id.nav_history)   switchTo(historyFragment);
+            else if (id == R.id.nav_fee)       switchTo(feeFragment);
+            else if (id == R.id.nav_household) switchTo(householdFragment);
+            else if (id == R.id.nav_profile)   switchTo(profileFragment);
             return true;
         });
     }
@@ -108,4 +113,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    public void navigateTo(Fragment target) {
+        switchTo(target);
+        if (target == visitorFragment)    bottomNav.setSelectedItemId(R.id.nav_visitor);
+        else if (target == feeFragment)   bottomNav.setSelectedItemId(R.id.nav_fee);
+        else if (target == profileFragment)   bottomNav.setSelectedItemId(R.id.nav_profile);
+        else if (target == householdFragment) bottomNav.setSelectedItemId(R.id.nav_household);
+        else if (target == dashboardFragment) bottomNav.setSelectedItemId(R.id.nav_dashboard);
+    }
+
+    public Fragment getEventsFragment()  { return eventsFragment; }
+    public Fragment getHistoryFragment() { return historyFragment; }
 }

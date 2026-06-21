@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        // Nếu đã đăng nhập → vào thẳng MainActivity
+
         if (mAuth.getCurrentUser() != null) {
             goToMain();
             return;
