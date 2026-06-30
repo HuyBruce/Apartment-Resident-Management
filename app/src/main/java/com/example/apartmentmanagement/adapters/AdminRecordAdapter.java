@@ -147,8 +147,11 @@ public class AdminRecordAdapter extends RecyclerView.Adapter<AdminRecordAdapter.
         if (normalizedAction.startsWith("xác nhận")) {
             return 0xFF173B70;
         }
-        if (normalizedAction.contains("duyệt") || normalizedAction.contains("bỏ chặn")) {
+        if (normalizedAction.contains("bỏ chặn")) {
             return 0xFF2E7D32;
+        }
+        if (normalizedAction.contains("duyệt")) {
+            return 0xFF173B70;
         }
         if (normalizedAction.startsWith("xem")) {
             return 0xFF2F5F9E;
@@ -163,8 +166,11 @@ public class AdminRecordAdapter extends RecyclerView.Adapter<AdminRecordAdapter.
         if (normalizedAction.startsWith("xác nhận")) {
             return 0xFF173B70;
         }
-        if (normalizedAction.contains("duyệt") || normalizedAction.contains("bỏ chặn")) {
+        if (normalizedAction.contains("bỏ chặn")) {
             return 0xFF2E7D32;
+        }
+        if (normalizedAction.contains("duyệt")) {
+            return 0xFF173B70;
         }
         if (normalizedAction.startsWith("xem")) {
             return 0xFF2F5F9E;

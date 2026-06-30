@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.apartmentmanagement.NotificationsActivity;
 import com.example.apartmentmanagement.R;
 
 import com.example.apartmentmanagement.activities.AdminFeesActivity;
@@ -49,7 +48,6 @@ public class AdminHomeActivity extends AppCompatActivity {
     private LinearLayout containerHomeRequests;
     private LinearLayout containerHomeFees;
     private LinearLayout containerHomeVisitors;
-    private LinearLayout containerHomeNotices;
 
     private FirebaseFirestore db;
     private final NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
@@ -60,7 +58,7 @@ public class AdminHomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_admin_home);
 
         db = FirebaseFirestore.getInstance();
 
@@ -84,7 +82,6 @@ public class AdminHomeActivity extends AppCompatActivity {
         containerHomeRequests = findViewById(R.id.containerHomeRequests);
         containerHomeFees = findViewById(R.id.containerHomeFees);
         containerHomeVisitors = findViewById(R.id.containerHomeVisitors);
-        containerHomeNotices = findViewById(R.id.containerHomeNotices);
     }
 
     private void showAdminInfo() {
@@ -104,9 +101,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         ImageButton btnNotification = findViewById(R.id.btnNotification);
         TextView tvSeeAllRepair = findViewById(R.id.tvSeeAllRepair);
         TextView tvSeeAllGuest = findViewById(R.id.tvSeeAllGuest);
-        TextView tvSeeAllAnn = findViewById(R.id.tvSeeAllAnn);
         TextView tvFeeDetail = findViewById(R.id.tvFeeDetail);
-        Button btnCreateAnnouncement = findViewById(R.id.btnCreateAnnouncement);
         LinearLayout btnAdminMenu = findViewById(R.id.btnAdminMenu);
         View drawerOverlay = findViewById(R.id.drawerOverlay);
         LinearLayout drawerMenu = findViewById(R.id.drawerMenu);
@@ -116,6 +111,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         LinearLayout menuParking = findViewById(R.id.menuParking);
         LinearLayout menuEvents = findViewById(R.id.menuEvents);
         LinearLayout menuFeedback = findViewById(R.id.menuFeedback);
+        LinearLayout menuVisitors = findViewById(R.id.menuVisitors);
         LinearLayout tabHome = findViewById(R.id.tabHome);
         LinearLayout tabRequests = findViewById(R.id.tabRequests);
         LinearLayout tabSettings = findViewById(R.id.tabSettings);
@@ -124,9 +120,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnNotification.setOnClickListener(v -> openActivity(AdminNoticesActivity.class));
         tvSeeAllRepair.setOnClickListener(v -> openActivity(AdminFeedbackActivity.class));
         tvSeeAllGuest.setOnClickListener(v -> openActivity(AdminVisitorsActivity.class));
-        tvSeeAllAnn.setOnClickListener(v -> openActivity(AdminNoticesActivity.class));
         tvFeeDetail.setOnClickListener(v -> openActivity(AdminPaymentsActivity.class));
-        btnCreateAnnouncement.setOnClickListener(v -> openActivity(AdminCreateNoticeActivity.class));
 
         btnAdminMenu.setOnClickListener(v -> drawerOverlay.setVisibility(View.VISIBLE));
         drawerOverlay.setOnClickListener(v -> drawerOverlay.setVisibility(View.GONE));
@@ -138,9 +132,10 @@ public class AdminHomeActivity extends AppCompatActivity {
         menuParking.setOnClickListener(v -> openMenuActivity(drawerOverlay, AdminParkingActivity.class));
         menuEvents.setOnClickListener(v -> openMenuActivity(drawerOverlay, AdminEventsActivity.class));
         menuFeedback.setOnClickListener(v -> openMenuActivity(drawerOverlay, AdminFeedbackActivity.class));
+        menuVisitors.setOnClickListener(v -> openMenuActivity(drawerOverlay, AdminVisitorsActivity.class));
 
         tabHome.setOnClickListener(v -> { });
-        tabRequests.setOnClickListener(v -> openActivity(AdminFeedbackActivity.class));
+        tabRequests.setOnClickListener(v -> openActivity(AdminNoticesActivity.class));
         tabSettings.setOnClickListener(v -> openActivity(ProfileActivity.class));
     }
 
@@ -168,7 +163,6 @@ public class AdminHomeActivity extends AppCompatActivity {
         loadRevenueStats();
         loadHomeRequests();
         loadHomeVisitors();
-        loadHomeNotices();
     }
 
     private void loadCollectionCount(String collectionName, TextView target) {
@@ -329,22 +323,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                     if (count == 0) containerHomeVisitors.addView(emptyRow("Không có khách chờ duyệt"));
                 })
                 .addOnFailureListener(e -> containerHomeVisitors.addView(emptyRow("Không tải được khách")));
-    }
-
-    private void loadHomeNotices() {
-        db.collection("notices")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    containerHomeNotices.removeAllViews();
-                    int count = 0;
-                    for (QueryDocumentSnapshot doc : snapshot) {
-                        containerHomeNotices.addView(infoRow("!", safeString(doc.get("title")),
-                                safeString(doc.get("type")) + " · " + safeString(doc.get("created_at")), ""));
-                        if (++count >= 2) break;
-                    }
-                    if (count == 0) containerHomeNotices.addView(emptyRow("Chưa có thông báo"));
-                })
-                .addOnFailureListener(e -> containerHomeNotices.addView(emptyRow("Không tải được thông báo")));
     }
 
     private double getNumber(DocumentSnapshot doc, String field) {
