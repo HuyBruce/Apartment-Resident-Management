@@ -1,9 +1,14 @@
 package com.example.apartmentmanagement;
 
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +28,7 @@ public class RequestStatusActivity extends AppCompatActivity {
 
     private TextView btnBack;
     private LinearLayout layoutRequests;
-
     private FirebaseFirestore db;
-
     private int userId;
     private int residentId;
     private String role;
@@ -38,7 +41,6 @@ public class RequestStatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_request_status);
 
         db = FirebaseFirestore.getInstance();
-
         userId = getIntent().getIntExtra("user_id", 1);
         residentId = getIntent().getIntExtra("resident_id", 1);
         role = getIntent().getStringExtra("role");
@@ -48,7 +50,6 @@ public class RequestStatusActivity extends AppCompatActivity {
         layoutRequests = findViewById(R.id.layoutRequests);
 
         btnBack.setOnClickListener(v -> finish());
-
         loadCategoriesThenRequests();
     }
 
@@ -57,16 +58,13 @@ public class RequestStatusActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     categoryMap.clear();
-
                     for (DocumentSnapshot doc : querySnapshot) {
                         Long idLong = doc.getLong("id");
                         String name = doc.getString("name");
-
                         if (idLong != null && name != null) {
                             categoryMap.put(idLong.intValue(), name);
                         }
                     }
-
                     loadRequests();
                 })
                 .addOnFailureListener(e -> loadRequests());
@@ -77,17 +75,14 @@ public class RequestStatusActivity extends AppCompatActivity {
 
         Query query;
         if ("resident".equals(role)) {
-            query = db.collection("requests")
-                    .whereEqualTo("resident_id", residentId);
+            query = db.collection("requests").whereEqualTo("resident_id", residentId);
         } else {
-            query = db.collection("requests")
-                    .orderBy("created_at", Query.Direction.DESCENDING);
+            query = db.collection("requests").orderBy("created_at", Query.Direction.DESCENDING);
         }
 
         query.get()
                 .addOnSuccessListener(querySnapshot -> {
                     layoutRequests.removeAllViews();
-
                     if (querySnapshot.isEmpty()) {
                         layoutRequests.addView(createText("Chưa có yêu cầu nào."));
                         return;
@@ -105,101 +100,131 @@ public class RequestStatusActivity extends AppCompatActivity {
     private View createRequestCard(DocumentSnapshot doc) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(24, 20, 24, 20);
+        card.setPadding(dp(18), dp(16), dp(18), dp(16));
         card.setBackgroundColor(0xFFFFFFFF);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(0, 0, 0, 16);
+        params.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(params);
 
         String docId = doc.getId();
-
         Long requestIdLong = doc.getLong("id");
         long requestId = requestIdLong != null ? requestIdLong : 0;
 
-        String rawTitle = doc.getString("title");
-        final String title = rawTitle != null ? rawTitle : "Yêu cầu";
-
-        String rawDescription = doc.getString("description");
-        final String description = rawDescription != null ? rawDescription : "";
-
-        String rawStatus = doc.getString("status");
-        final String status = rawStatus != null ? rawStatus : "pending";
-
-        String rawCreatedAt = doc.getString("created_at");
-        final String createdAt = rawCreatedAt != null ? rawCreatedAt : "";
+        String title = valueOrDefault(doc.getString("title"), "Yêu cầu");
+        String description = valueOrDefault(doc.getString("description"), "");
+        String status = valueOrDefault(doc.getString("status"), "pending");
+        String createdAt = valueOrDefault(doc.getString("created_at"), "");
 
         Long categoryIdLong = doc.getLong("category_id");
-        String foundCategory = (categoryIdLong != null) ? categoryMap.get(categoryIdLong.intValue()) : null;
-        final String categoryName = (foundCategory != null) ? foundCategory : "Khác";
+        String foundCategory = categoryIdLong != null ? categoryMap.get(categoryIdLong.intValue()) : null;
+        String categoryName = foundCategory != null ? foundCategory : "Khác";
 
         TextView tvTitle = new TextView(this);
         tvTitle.setText(title);
         tvTitle.setTextColor(0xFF222222);
         tvTitle.setTextSize(17);
-        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        tvTitle.setTypeface(null, Typeface.BOLD);
 
         TextView tvInfo = new TextView(this);
-        tvInfo.setText(
-                "Loại: " + categoryName +
-                        "\nTrạng thái: " + convertStatus(status) +
-                        "\nNgày gửi: " + createdAt +
-                        "\nMô tả: " + description
-        );
+        if ("resident".equals(role)) {
+            tvInfo.setText(
+                    "Loại: " + categoryName +
+                            "\nTrạng thái: " + convertStatus(status) +
+                            "\nNgày gửi: " + createdAt +
+                            "\nMô tả: " + description
+            );
+        } else {
+            tvInfo.setText(
+                    "Loại: " + categoryName +
+                            "\nNgày gửi: " + createdAt +
+                            "\nMô tả: " + description
+            );
+        }
         tvInfo.setTextColor(0xFF444444);
         tvInfo.setTextSize(14);
-        tvInfo.setPadding(0, 10, 0, 0);
+        tvInfo.setPadding(0, dp(8), 0, 0);
 
         card.addView(tvTitle);
         card.addView(tvInfo);
 
         if (!"resident".equals(role)) {
-            LinearLayout buttonRow = new LinearLayout(this);
-            buttonRow.setOrientation(LinearLayout.HORIZONTAL);
-            buttonRow.setPadding(0, 14, 0, 0);
+            TextView tvAdminHint = new TextView(this);
+            tvAdminHint.setText("Chọn trạng thái xử lý");
+            tvAdminHint.setTextColor(0xFF1A2744);
+            tvAdminHint.setTextSize(13);
+            tvAdminHint.setTypeface(null, Typeface.BOLD);
+            tvAdminHint.setPadding(0, dp(10), 0, 0);
 
-            Button btnPending = createButton("Pending");
-            Button btnProcessing = createButton("Processing");
-            Button btnDone = createButton("Done");
+            Spinner spinnerStatus = new Spinner(this);
+            String[] labels = new String[]{"Chờ xử lý", "Đang xử lý", "Đã xử lý"};
+            String[] values = new String[]{"pending", "processing", "done"};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    labels
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerStatus.setAdapter(adapter);
+            spinnerStatus.setSelection(statusIndex(status));
 
-            btnPending.setOnClickListener(v -> updateStatus(docId, requestId, status, "pending"));
-            btnProcessing.setOnClickListener(v -> updateStatus(docId, requestId, status, "processing"));
-            btnDone.setOnClickListener(v -> updateStatus(docId, requestId, status, "done"));
+            LinearLayout.LayoutParams spinnerParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(48)
+            );
+            spinnerParams.setMargins(0, dp(8), 0, 0);
+            spinnerStatus.setLayoutParams(spinnerParams);
 
-            buttonRow.addView(btnPending);
-            buttonRow.addView(btnProcessing);
-            buttonRow.addView(btnDone);
+            Button btnSave = createSaveButton();
+            btnSave.setOnClickListener(v -> {
+                String newStatus = values[spinnerStatus.getSelectedItemPosition()];
+                updateStatus(docId, requestId, status, newStatus);
+            });
 
-            card.addView(buttonRow);
+            card.addView(tvAdminHint);
+            card.addView(spinnerStatus);
+            card.addView(btnSave);
         }
 
         return card;
     }
 
-    private Button createButton(String text) {
+    private Button createSaveButton() {
         Button button = new Button(this);
-        button.setText(text);
-        button.setTextSize(11);
+        button.setText("Lưu trạng thái");
+        button.setTextColor(0xFFFFFFFF);
+        button.setTextSize(13);
+        button.setAllCaps(false);
+        button.setMinHeight(0);
+        button.setMinWidth(0);
+        button.setPadding(dp(16), 0, dp(16), 0);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                1
-        );
-        params.setMargins(4, 0, 4, 0);
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(0xFF2F5F9E);
+        background.setCornerRadius(dp(14));
+        button.setBackground(background);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(156), dp(40));
+        params.setMargins(0, dp(12), 0, 0);
+        params.gravity = Gravity.END;
         button.setLayoutParams(params);
 
         return button;
+    }
+
+    private int statusIndex(String status) {
+        if ("processing".equals(status)) return 1;
+        if ("done".equals(status)) return 2;
+        return 0;
     }
 
     private void updateStatus(String docId, long requestId, String oldStatus, String newStatus) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("status", newStatus);
         updates.put("updated_at", getCurrentTime());
-
         if ("done".equals(newStatus)) {
             updates.put("completed_at", getCurrentTime());
         }
@@ -250,12 +275,20 @@ public class RequestStatusActivity extends AppCompatActivity {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 
+    private String valueOrDefault(String value, String fallback) {
+        return value != null ? value : fallback;
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
     private TextView createText(String text) {
         TextView textView = new TextView(this);
         textView.setText(text);
         textView.setTextColor(0xFF777777);
         textView.setTextSize(15);
-        textView.setPadding(12, 12, 12, 12);
+        textView.setPadding(dp(12), dp(12), dp(12), dp(12));
         return textView;
     }
 }

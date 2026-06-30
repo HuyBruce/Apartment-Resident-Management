@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.apartmentmanagement.activities.AdminHomeActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -127,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
             String fullName,
             String role
     ) {
-        Intent intent = new Intent(LoginActivity.this, ResidentHomeActivity.class);
+        Intent intent = new Intent(LoginActivity.this, AdminHomeActivity.class);
 
         intent.putExtra("user_id", userId);
         intent.putExtra("full_name", fullName);

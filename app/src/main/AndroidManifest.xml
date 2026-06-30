@@ -15,7 +15,37 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
+            android:name=".NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RequestStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminResidentsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminApartmentsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminFeesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminPaymentsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminVisitorsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminNoticesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminCreateNoticeActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AdminHomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
