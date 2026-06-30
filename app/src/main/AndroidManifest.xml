@@ -11,6 +11,7 @@
         <activity android:name=".activities.AdminFeesActivity" android:exported="false"/>
         <activity android:name=".activities.AdminParkingActivity" android:exported="false"/>
         <activity android:name=".activities.AdminEventsActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminFeedbackActivity" android:exported="false"/>
         <activity android:name=".activities.AdminPaymentsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminVisitorsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminNoticesActivity" android:exported="false"/>

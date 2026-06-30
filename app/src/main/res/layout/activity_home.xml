@@ -92,6 +92,11 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Sự kiện" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
                 <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_chevron_right" app:tint="@color/text_hint"/>
             </LinearLayout>
+            <LinearLayout android:id="@+id/menuFeedback" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="10dp" android:background="@drawable/shape_drawer_item" android:clickable="true" android:focusable="true" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="14dp">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_marginEnd="14dp" android:src="@drawable/ic_tools" app:tint="@color/purple_dark"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Phản ánh / Yêu cầu" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
+                <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_chevron_right" app:tint="@color/text_hint"/>
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
