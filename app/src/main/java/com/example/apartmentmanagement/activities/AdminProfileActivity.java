@@ -19,7 +19,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileActivity extends AppCompatActivity {
+public class AdminProfileActivity extends AppCompatActivity {
 
     private TextView tvName, tvStatus, tvApartmentChip;
     private EditText etName, etPhone, etEmail, etDob, etGender, etApartment, etMembers, etIdentity;
@@ -34,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_admin_profile);
 
         db = FirebaseFirestore.getInstance();
         role = getIntent().getStringExtra("role");
@@ -52,9 +52,16 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private String resolveProfileDocId() {
-        int userId = getIntent().getIntExtra("user_id", 1);
-        if (isAdmin) return String.valueOf(userId);
+        String explicitDocId = getIntent().getStringExtra("profile_doc_id");
+        if (explicitDocId != null && !explicitDocId.trim().isEmpty()) {
+            return explicitDocId.trim();
+        }
 
+        if (isAdmin) {
+            return "admin";
+        }
+
+        int userId = getIntent().getIntExtra("user_id", 1);
         int residentId = getIntent().getIntExtra("resident_id", userId);
         if (residentId > 0) return String.valueOf(residentId);
 
@@ -121,9 +128,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         tvStatus.setText("Quản trị viên");
         tvApartmentChip.setText("Admin");
-        setVisible(R.id.fieldDob, false);
-        setVisible(R.id.fieldGender, false);
-        setVisible(R.id.fieldIdentity, false);
+
+        setFieldLabel(R.id.fieldIdentity, R.drawable.ic_shield_check, "Vai trò");
         setVisible(R.id.cardApartment, false);
 
         View statResidence = findViewById(R.id.statResidence);
@@ -170,7 +176,20 @@ public class ProfileActivity extends AppCompatActivity {
         etEmail.setText(email);
 
         if (isAdmin) {
-            tvApartmentChip.setText(value(data.get("role"), "admin"));
+            String dob = firstNonEmpty(
+                    value(data.get("date_birth"), ""),
+                    value(data.get("date_of_birth"), ""),
+                    value(data.get("dob"), "")
+            );
+            String gender = value(data.get("gender"), "");
+            String adminRole = value(data.get("role"), "admin");
+            String activeText = isActive(data.get("is_active")) ? "Quản trị viên đang hoạt động" : "Quản trị viên đang bị khóa";
+
+            etDob.setText(dob);
+            etGender.setText(gender);
+            etIdentity.setText(adminRole);
+            tvApartmentChip.setText(adminRole);
+            tvStatus.setText(activeText);
             return;
         }
 
@@ -187,8 +206,12 @@ public class ProfileActivity extends AppCompatActivity {
         if (name == null || name.trim().isEmpty()) name = isAdmin ? "Admin" : "Cư dân";
 
         tvName.setText(name);
-        tvApartmentChip.setText(isAdmin ? "Admin" : "Căn hộ");
+        tvApartmentChip.setText(isAdmin ? "admin" : "Căn hộ");
+        tvStatus.setText(isAdmin ? "Quản trị viên" : "Cư dân đang hoạt động");
         etName.setText(name);
+        if (isAdmin) {
+            etIdentity.setText("admin");
+        }
     }
 
     private void saveProfile() {
@@ -203,8 +226,10 @@ public class ProfileActivity extends AppCompatActivity {
         data.put("email", etEmail.getText().toString().trim());
 
         if (isAdmin) {
-            data.put("role", "admin");
-            data.put("is_active", 1);
+            data.put("date_birth", etDob.getText().toString().trim());
+            data.put("gender", etGender.getText().toString().trim());
+            data.put("role", firstNonEmpty(etIdentity.getText().toString().trim(), "admin"));
+            data.put("is_active", "1");
         } else {
             data.put("date_of_birth", etDob.getText().toString().trim());
             data.put("gender", etGender.getText().toString().trim());
@@ -221,7 +246,10 @@ public class ProfileActivity extends AppCompatActivity {
                     btnSave.setEnabled(true);
                     btnSave.setText("Lưu thay đổi");
                     tvName.setText(etName.getText().toString().trim());
-                    if (!isAdmin) {
+                    if (isAdmin) {
+                        tvApartmentChip.setText(firstNonEmpty(etIdentity.getText().toString().trim(), "admin"));
+                        tvStatus.setText("Quản trị viên đang hoạt động");
+                    } else {
                         tvApartmentChip.setText("Căn hộ " + etApartment.getText().toString().trim());
                     }
                     showSnackbar("Hồ sơ đã được cập nhật");
@@ -256,6 +284,22 @@ public class ProfileActivity extends AppCompatActivity {
         if (value == null) return fallback == null ? "" : fallback;
         String text = String.valueOf(value);
         return text.trim().isEmpty() ? (fallback == null ? "" : fallback) : text;
+    }
+
+    private String firstNonEmpty(String... values) {
+        if (values == null) return "";
+        for (String value : values) {
+            if (value != null && !value.trim().isEmpty()) return value.trim();
+        }
+        return "";
+    }
+
+    private boolean isActive(Object value) {
+        String text = value(value, "").trim().toLowerCase();
+        return text.equals("1")
+                || text.equals("true")
+                || text.equals("active")
+                || text.equals("đang hoạt động");
     }
 
     private void showSnackbar(String msg) {

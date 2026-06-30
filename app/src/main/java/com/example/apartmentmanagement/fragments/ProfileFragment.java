@@ -17,7 +17,6 @@ import com.example.apartmentmanagement.utils.UserHelper;
 import com.example.apartmentmanagement.models.Resident;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class ProfileFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // Dùng lại layout activity_profile
-        return inflater.inflate(R.layout.activity_profile, container, false);
+        return inflater.inflate(R.layout.activity_admin_profile, container, false);
     }
 
     @Override

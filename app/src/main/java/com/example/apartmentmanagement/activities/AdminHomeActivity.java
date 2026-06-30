@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -19,10 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apartmentmanagement.R;
 
-import com.example.apartmentmanagement.activities.AdminFeesActivity;
-import com.example.apartmentmanagement.activities.AdminNoticesActivity;
-import com.example.apartmentmanagement.activities.AdminPaymentsActivity;
-import com.example.apartmentmanagement.activities.AdminVisitorsActivity;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -120,7 +116,6 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnNotification.setOnClickListener(v -> openActivity(AdminNoticesActivity.class));
         tvSeeAllRepair.setOnClickListener(v -> openActivity(AdminFeedbackActivity.class));
         tvSeeAllGuest.setOnClickListener(v -> openActivity(AdminVisitorsActivity.class));
-        tvFeeDetail.setOnClickListener(v -> openActivity(AdminPaymentsActivity.class));
 
         btnAdminMenu.setOnClickListener(v -> drawerOverlay.setVisibility(View.VISIBLE));
         drawerOverlay.setOnClickListener(v -> drawerOverlay.setVisibility(View.GONE));
@@ -136,7 +131,15 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         tabHome.setOnClickListener(v -> { });
         tabRequests.setOnClickListener(v -> openActivity(AdminNoticesActivity.class));
-        tabSettings.setOnClickListener(v -> openActivity(ProfileActivity.class));
+        tabSettings.setOnClickListener(v -> openAdminProfile());
+    }
+
+    private void openAdminProfile() {
+        Intent intent = new Intent(this, AdminProfileActivity.class);
+        intent.putExtra("role", "admin");
+        intent.putExtra("profile_doc_id", "admin");
+        intent.putExtra("full_name", safeString(tvAdminName != null ? tvAdminName.getText() : "Admin"));
+        startActivity(intent);
     }
 
 

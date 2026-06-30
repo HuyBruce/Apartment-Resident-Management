@@ -12,7 +12,6 @@
         <activity android:name=".activities.AdminParkingActivity" android:exported="false"/>
         <activity android:name=".activities.AdminEventsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminFeedbackActivity" android:exported="false"/>
-        <activity android:name=".activities.AdminPaymentsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminVisitorsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminNoticesActivity" android:exported="false"/>
         <activity android:name=".activities.AdminCreateNoticeActivity" android:exported="false"/>
@@ -22,8 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ProfileActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminProfileActivity" android:exported="false"/>
         <activity android:name=".activities.FeeActivity" android:exported="false"/>
-        <activity android:name=".activities.LoginActivity" android:exported="false"/>
+
     </application>
 </manifest>
