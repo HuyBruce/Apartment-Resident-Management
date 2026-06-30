@@ -212,7 +212,7 @@ public abstract class BaseAdminListActivity extends AppCompatActivity {
         if (subtitleView != null) subtitleView.setText(getSubtitleText() + " • " + visibleRecords.size() + " bản ghi");
     }
 
-    private boolean matches(AdminRecordAdapter.AdminRecord record, String keyword) {
+    protected boolean matches(AdminRecordAdapter.AdminRecord record, String keyword) {
         String text = (safe(record.title) + " " + safe(record.subtitle) + " " + safe(record.body) + " " + safe(record.status))
                 .toLowerCase(Locale.ROOT);
         return text.contains(keyword);
