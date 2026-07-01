@@ -13,11 +13,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.apartmentmanagement.MainActivity;
 import com.example.apartmentmanagement.R;
 import com.example.apartmentmanagement.adapters.ActivityLogAdapter;
 import com.example.apartmentmanagement.adapters.FeeAdapter;
-import com.example.apartmentmanagement.MainActivity;
-
 import com.example.apartmentmanagement.models.ActivityLog;
 import com.example.apartmentmanagement.models.Fee;
 import com.example.apartmentmanagement.models.Resident;
@@ -119,7 +118,6 @@ public class DashboardFragment extends Fragment {
             nav.setSelectedItemId(R.id.nav_fee);
         });
 
-        // Xem tất cả logs → History
         tvSeeAllLogs.setOnClickListener(v -> {
             MainActivity ma = (MainActivity) requireActivity();
             ma.navigateTo(ma.getHistoryFragment());
@@ -130,13 +128,11 @@ public class DashboardFragment extends Fragment {
             nav.setSelectedItemId(R.id.nav_fee);
         });
 
-        // Card Khách → VisitorFragment
         rootView.findViewById(R.id.cardStatVisitor).setOnClickListener(v -> {
             BottomNavigationView nav = requireActivity().findViewById(R.id.bottomNav);
             nav.setSelectedItemId(R.id.nav_services);
         });
 
-        // Card Lịch sử → HistoryFragment
         rootView.findViewById(R.id.cardStatLog).setOnClickListener(v -> {
             MainActivity ma = (MainActivity) requireActivity();
             ma.navigateTo(ma.getHistoryFragment());
@@ -157,7 +153,6 @@ public class DashboardFragment extends Fragment {
             nav.setSelectedItemId(R.id.nav_services);
         });
 
-        // Quick Sự kiện → EventsFragment
         rootView.findViewById(R.id.quickHistory).setOnClickListener(v -> {
             MainActivity ma = (MainActivity) requireActivity();
             ma.navigateTo(ma.getEventsFragment());
