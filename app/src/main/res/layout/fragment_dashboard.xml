@@ -30,25 +30,33 @@
                 android:textSize="13sp"
                 android:text="☀️ Chào buổi sáng"/>
 
-            <TextView
-                android:id="@+id/tvDashResidentName"
-                android:layout_width="wrap_content"
+            <!-- Tên + nút refresh cùng hàng -->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:text="Nguyễn Văn An"/>
+                android:layout_marginTop="4dp">
 
-            <ImageButton
-                android:id="@+id/btnRefresh"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="end"
-                android:background="@drawable/bg_chip_white"
-                android:padding="8dp"
-                android:src="@drawable/ic_refresh"
-                app:tint="#FFFFFF" />
+                <TextView
+                    android:id="@+id/tvDashResidentName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:text="Nguyễn Văn An"/>
+
+                <ImageButton
+                    android:id="@+id/btnRefresh"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/bg_chip_white"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_refresh"
+                    android:tint="#FFFFFF"/>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/tvDashApartment"
@@ -363,7 +371,7 @@
                             android:gravity="center"/>
                     </LinearLayout>
 
-                    <!-- Lịch sử -->
+                    <!-- Sự kiện (thay Lịch sử) -->
                     <LinearLayout
                         android:id="@+id/quickHistory"
                         android:layout_width="0dp"
@@ -375,19 +383,19 @@
                         <FrameLayout
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:background="@drawable/bg_stat_card">
+                            android:background="@drawable/bg_icon_blue">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:text="📋"
+                                android:text="🎉"
                                 android:textSize="20sp"/>
                         </FrameLayout>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="Lịch sử"
+                            android:text="Sự kiện"
                             android:textSize="11sp"
                             android:textColor="#444444"
                             android:gravity="center"/>

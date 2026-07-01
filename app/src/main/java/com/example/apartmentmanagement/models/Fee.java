@@ -1,16 +1,16 @@
 package com.example.apartmentmanagement.models;
 
+import com.example.apartmentmanagement.utils.PenaltyCalculator;
+
 public class Fee {
     private String id;
     private String resident_id;
-    private long apartment_id;
     private String category;
-    private long amount;
+    private String title;
     private String description;
+    private long amount;
     private String due_date;
-    private String status; // "unpaid" | "paid"
-    private String created_at;
-    private String updated_at;
+    private String status;
 
     public Fee() {}
 
@@ -18,29 +18,48 @@ public class Fee {
     public void setId(String id) { this.id = id; }
 
     public String getResident_id() { return resident_id; }
-    public void setResident_id(String v) { this.resident_id = v; }
-
-    public long getApartment_id() { return apartment_id; }
-    public void setApartment_id(long v) { this.apartment_id = v; }
+    public void setResident_id(String resident_id) { this.resident_id = resident_id; }
 
     public String getCategory() { return category; }
-    public void setCategory(String v) { this.category = v; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description != null ? description : title; }
+    public void setDescription(String description) { this.description = description; }
 
     public long getAmount() { return amount; }
-    public void setAmount(long v) { this.amount = v; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String v) { this.description = v; }
+    public void setAmount(long amount) { this.amount = amount; }
 
     public String getDue_date() { return due_date; }
-    public void setDue_date(String v) { this.due_date = v; }
+    public void setDue_date(String due_date) { this.due_date = due_date; }
 
     public String getStatus() { return status; }
-    public void setStatus(String v) { this.status = v; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getCreated_at() { return created_at; }
-    public void setCreated_at(String v) { this.created_at = v; }
 
-    public String getUpdated_at() { return updated_at; }
-    public void setUpdated_at(String v) { this.updated_at = v; }
+    public boolean isOverdue() {
+        return "unpaid".equals(status) && PenaltyCalculator.getOverdueDays(due_date) > 0;
+    }
+
+    public int getOverdueDays() {
+        return PenaltyCalculator.getOverdueDays(due_date);
+    }
+
+    public long getPenaltyAmount() {
+        return PenaltyCalculator.getPenaltyAmount(amount, getOverdueDays());
+    }
+
+    public long getTotalAmount() {
+        return PenaltyCalculator.getTotalAmount(amount, getOverdueDays());
+    }
+
+    public String getDebtLevel() {
+        return PenaltyCalculator.getDebtLevel(getOverdueDays());
+    }
+
+    public String getReminderMessage() {
+        return PenaltyCalculator.getReminderMessage(getOverdueDays());
+    }
 }
