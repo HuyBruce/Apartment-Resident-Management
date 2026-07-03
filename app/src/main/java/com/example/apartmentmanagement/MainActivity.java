@@ -48,7 +48,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
-        bottomNav = findViewById(R.id.bottomNav);
+
+        // activity_main.xml dùng id bottomNavigation cho BottomNavigationView.
+        // Không dùng R.id.bottomNav vì id đó thuộc layout admin home và là LinearLayout.
+        bottomNav = findViewById(R.id.bottomNavigation);
 
         FragmentManager fm = getSupportFragmentManager();
 
@@ -84,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             profileFragment    = fm.findFragmentByTag("profile");
             dashboardFragment  = fm.findFragmentByTag("dashboard");
 
-            // Xác định fragment nào đang hiển thị
             if      (dashboardFragment  != null && !dashboardFragment.isHidden())  activeFragment = dashboardFragment;
             else if (servicesFragment   != null && !servicesFragment.isHidden())   activeFragment = servicesFragment;
             else if (feeFragment        != null && !feeFragment.isHidden())        activeFragment = feeFragment;

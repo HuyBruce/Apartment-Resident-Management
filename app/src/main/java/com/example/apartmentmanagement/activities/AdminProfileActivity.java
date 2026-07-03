@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -23,7 +24,7 @@ public class AdminProfileActivity extends AppCompatActivity {
 
     private TextView tvName, tvStatus, tvApartmentChip;
     private EditText etName, etPhone, etEmail, etDob, etGender, etApartment, etMembers, etIdentity;
-    private MaterialButton btnSave, btnLoad;
+    private MaterialButton btnSave, btnLoad, btnLogout;
     private FirebaseFirestore db;
     private View rootView;
 
@@ -49,6 +50,7 @@ public class AdminProfileActivity extends AppCompatActivity {
 
         btnLoad.setOnClickListener(v -> loadProfile());
         btnSave.setOnClickListener(v -> saveProfile());
+        btnLogout.setOnClickListener(v -> logout());
     }
 
     private String resolveProfileDocId() {
@@ -108,6 +110,7 @@ public class AdminProfileActivity extends AppCompatActivity {
 
         btnSave = findViewById(R.id.btnSave);
         btnLoad = findViewById(R.id.btnLoad);
+        btnLogout = findViewById(R.id.btnLogout);
     }
 
     private EditText fieldValue(int includeId) {
@@ -212,6 +215,15 @@ public class AdminProfileActivity extends AppCompatActivity {
         if (isAdmin) {
             etIdentity.setText("admin");
         }
+    }
+
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();
+
+        Intent intent = new Intent(AdminProfileActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void saveProfile() {

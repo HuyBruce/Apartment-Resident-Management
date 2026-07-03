@@ -15,14 +15,14 @@
         <activity android:name=".activities.AdminVisitorsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminNoticesActivity" android:exported="false"/>
         <activity android:name=".activities.AdminCreateNoticeActivity" android:exported="false"/>
-        <activity android:name=".activities.AdminHomeActivity" android:exported="true">
+        <activity android:name=".activities.AdminHomeActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminProfileActivity" android:exported="false"/>
+        <activity android:name=".activities.FeeActivity" android:exported="false"/>
+        <activity android:name=".activities.LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.AdminProfileActivity" android:exported="false"/>
-        <activity android:name=".activities.FeeActivity" android:exported="false"/>
-
     </application>
 </manifest>

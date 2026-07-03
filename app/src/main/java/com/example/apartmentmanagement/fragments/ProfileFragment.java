@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.fragments;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.apartmentmanagement.R;
+import com.example.apartmentmanagement.activities.LoginActivity;
 import com.example.apartmentmanagement.utils.UserHelper;
 import com.example.apartmentmanagement.models.Resident;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +29,7 @@ public class ProfileFragment extends Fragment {
 
     private TextView tvName, tvApartmentChip;
     private EditText etName, etPhone, etEmail, etDob, etGender, etApartment, etMembers, etIdentity;
-    private MaterialButton btnSave, btnLoad;
+    private MaterialButton btnSave, btnLoad, btnLogout;
     private View rootView;
 
     private FirebaseFirestore db;
@@ -55,6 +58,9 @@ public class ProfileFragment extends Fragment {
 
         btnLoad.setOnClickListener(v -> loadProfile());
         btnSave.setOnClickListener(v -> saveProfile());
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> logout());
+        }
     }
 
     private void bindViews(View v) {
@@ -81,6 +87,7 @@ public class ProfileFragment extends Fragment {
 
         btnSave = v.findViewById(R.id.btnSave);
         btnLoad = v.findViewById(R.id.btnLoad);
+        btnLogout = v.findViewById(R.id.btnLogout);
     }
 
     private void setFieldLabel(View root, int includeId, int iconRes, String label) {
@@ -142,6 +149,15 @@ public class ProfileFragment extends Fragment {
         db.collection("requests").whereEqualTo("resident_id", residentId).get()
                 .addOnSuccessListener(snap ->
                         setStatCard(rootView, R.id.statRequest, String.valueOf(snap.size()), "Yêu cầu"));
+    }
+
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();
+
+        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 
     private void saveProfile() {

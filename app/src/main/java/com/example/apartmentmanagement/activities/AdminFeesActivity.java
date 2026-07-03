@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -68,6 +69,7 @@ public class AdminFeesActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         bindViews();
         setupHeader();
+        setupBackButton();
         setupFilters();
         setupSearch();
         loadData();
@@ -97,6 +99,18 @@ public class AdminFeesActivity extends AppCompatActivity {
         subtitleView.setText("Tổng nợ theo căn hộ, phí quá hạn và nhắc nợ");
         fab.setText("Làm mới");
         fab.setOnClickListener(v -> loadData());
+    }
+
+    private void setupBackButton() {
+        View backButton = findViewById(R.id.btnAdminBack);
+        if (backButton == null) return;
+
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminHomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void setupFilters() {

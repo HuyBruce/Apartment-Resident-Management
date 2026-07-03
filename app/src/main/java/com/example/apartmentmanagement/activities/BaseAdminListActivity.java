@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.activities;
 
+import android.content.Intent;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -56,6 +57,7 @@ public abstract class BaseAdminListActivity extends AppCompatActivity {
         bindBaseViews();
         onAfterBaseViewsBound();
         setupHeader();
+        setupBackButton();
         setupFilters();
         setupSearch();
         loadData();
@@ -116,6 +118,18 @@ public abstract class BaseAdminListActivity extends AppCompatActivity {
             fab.setText(getFabText());
             fab.setOnClickListener(v -> onFabClick());
         }
+    }
+
+    private void setupBackButton() {
+        View backButton = findViewById(R.id.btnAdminBack);
+        if (backButton == null) return;
+
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminHomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
     }
 
     protected void setupFilters() {
