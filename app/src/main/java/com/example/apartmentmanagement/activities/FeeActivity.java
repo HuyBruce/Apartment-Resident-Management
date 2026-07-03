@@ -20,9 +20,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class FeeActivity extends AppCompatActivity {
 
@@ -126,14 +130,16 @@ public class FeeActivity extends AppCompatActivity {
         if (currentFilter == 2) {
             // Hiển thị tổng đã đóng
             long totalPaid = 0;
-            for (Fee f : filteredFees) totalPaid += f.getAmount();
+            for (Fee f : filteredFees) {
+                totalPaid += f.getPaid_amount() > 0 ? f.getPaid_amount() : f.getAmount();
+            }
             tvTotalAmount.setText(fmt.format(totalPaid) + " đ");
             tvTotalLabel.setText("Tổng đã đóng");
         } else {
             // Hiển thị tổng chưa đóng
             long totalUnpaid = 0;
             for (Fee f : allFees)
-                if ("unpaid".equals(f.getStatus())) totalUnpaid += f.getAmount();
+                if ("unpaid".equals(f.getStatus())) totalUnpaid += f.getTotalAmount();
             tvTotalAmount.setText(fmt.format(totalUnpaid) + " đ");
             tvTotalLabel.setText("Tổng cần đóng");
         }
@@ -141,11 +147,16 @@ public class FeeActivity extends AppCompatActivity {
 
     private void confirmPayment(Fee fee) {
         NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
+        long penaltyAmount = fee.getPenaltyAmount();
+        long totalAmount = fee.getTotalAmount();
+
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Xác nhận thanh toán")
                 .setMessage("Bạn xác nhận đã đóng:\n\n" +
                         fee.getCategory() + "\n" +
-                        fmt.format(fee.getAmount()) + " đ\n\n" +
+                        "Tiền gốc: " + fmt.format(fee.getAmount()) + " đ\n" +
+                        "Tiền phạt: " + fmt.format(penaltyAmount) + " đ\n" +
+                        "Tổng thanh toán: " + fmt.format(totalAmount) + " đ\n\n" +
                         "Hạn: " + fee.getDue_date())
                 .setPositiveButton("Xác nhận", (dialog, which) -> markAsPaid(fee))
                 .setNegativeButton("Hủy", null)
@@ -153,10 +164,26 @@ public class FeeActivity extends AppCompatActivity {
     }
 
     private void markAsPaid(Fee fee) {
+        long penaltyAmount = fee.getPenaltyAmount();
+        long totalAmount = fee.getTotalAmount();
+        String paidAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .format(Calendar.getInstance().getTime());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", "paid");
+        data.put("penalty_amount", penaltyAmount);
+        data.put("paid_amount", totalAmount);
+        data.put("paid_at", paidAt);
+        data.put("payment_method", "resident_confirmed");
+
         db.collection("fees").document(fee.getId())
-                .update("status", "paid")
+                .update(data)
                 .addOnSuccessListener(unused -> {
                     fee.setStatus("paid");
+                    fee.setPenalty_amount(penaltyAmount);
+                    fee.setPaid_amount(totalAmount);
+                    fee.setPaid_at(paidAt);
+                    fee.setPayment_method("resident_confirmed");
                     applyFilter();
                     Snackbar.make(rootView, "✓ Đã cập nhật trạng thái thanh toán", Snackbar.LENGTH_SHORT).show();
                 })
