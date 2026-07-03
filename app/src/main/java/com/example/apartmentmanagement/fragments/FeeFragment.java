@@ -18,15 +18,18 @@ import com.example.apartmentmanagement.models.Fee;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.example.apartmentmanagement.utils.UserHelper;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class FeeFragment extends Fragment {
 
@@ -40,6 +43,7 @@ public class FeeFragment extends Fragment {
     private View rootView;
 
     private FirebaseFirestore db;
+    private String userId;
     private String residentId;
     private int currentFilter = 0;
 
@@ -56,6 +60,7 @@ public class FeeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         db = FirebaseFirestore.getInstance();
+        userId = "";
         residentId = "";
 
         rootView      = view;
@@ -82,6 +87,7 @@ public class FeeFragment extends Fragment {
             applyFilter();
         });
         UserHelper.getIds((userId, resId) -> {
+            this.userId = userId;
             residentId = resId;
             loadFees();
         }, msg -> Snackbar.make(rootView, msg, Snackbar.LENGTH_SHORT).show());
@@ -119,12 +125,18 @@ public class FeeFragment extends Fragment {
         NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
         if (currentFilter == 2) {
             long total = 0;
-            for (Fee f : filteredFees) total += f.getAmount();
+            for (Fee f : filteredFees) {
+                total += f.getPaid_amount() > 0 ? f.getPaid_amount() : f.getAmount();
+            }
             tvTotalAmount.setText(fmt.format(total) + " đ");
             tvTotalLabel.setText("Tổng đã đóng");
         } else {
             long total = 0;
-            for (Fee f : allFees) if ("unpaid".equals(f.getStatus())) total += f.getAmount();
+            for (Fee f : allFees) {
+                if ("unpaid".equals(f.getStatus())) {
+                    total += f.getTotalAmount();
+                }
+            }
             tvTotalAmount.setText(fmt.format(total) + " đ");
             tvTotalLabel.setText("Tổng cần đóng");
         }
@@ -132,21 +144,43 @@ public class FeeFragment extends Fragment {
 
     private void confirmPayment(Fee fee) {
         NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
+        long penaltyAmount = fee.getPenaltyAmount();
+        long totalAmount = fee.getTotalAmount();
+
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Xác nhận thanh toán")
                 .setMessage("Bạn xác nhận đã đóng:\n\n" +
                         fee.getCategory() + "\n" +
-                        fmt.format(fee.getAmount()) + " đ\n\nHạn: " + fee.getDue_date())
+                        "Tiền gốc: " + fmt.format(fee.getAmount()) + " đ\n" +
+                        "Tiền phạt: " + fmt.format(penaltyAmount) + " đ\n" +
+                        "Tổng thanh toán: " + fmt.format(totalAmount) + " đ\n\n" +
+                        "Hạn: " + fee.getDue_date())
                 .setPositiveButton("Xác nhận", (d, w) -> markAsPaid(fee))
                 .setNegativeButton("Hủy", null)
                 .show();
     }
 
     private void markAsPaid(Fee fee) {
+        long penaltyAmount = fee.getPenaltyAmount();
+        long totalAmount = fee.getTotalAmount();
+        String paidAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .format(Calendar.getInstance().getTime());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", "paid");
+        data.put("penalty_amount", penaltyAmount);
+        data.put("paid_amount", totalAmount);
+        data.put("paid_at", paidAt);
+        data.put("payment_method", "resident_confirmed");
+
         db.collection("fees").document(fee.getId())
-                .update("status", "paid")
+                .update(data)
                 .addOnSuccessListener(unused -> {
                     fee.setStatus("paid");
+                    fee.setPenalty_amount(penaltyAmount);
+                    fee.setPaid_amount(totalAmount);
+                    fee.setPaid_at(paidAt);
+                    fee.setPayment_method("resident_confirmed");
                     applyFilter();
                     Snackbar.make(rootView, "✓ Đã cập nhật thanh toán", Snackbar.LENGTH_SHORT).show();
                 })

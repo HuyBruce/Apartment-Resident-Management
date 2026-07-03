@@ -9,7 +9,11 @@ public class Fee {
     private String title;
     private String description;
     private long amount;
+    private long penalty_amount;
+    private long paid_amount;
     private String due_date;
+    private String paid_at;
+    private String payment_method;
     private String status;
 
     public Fee() {}
@@ -32,8 +36,20 @@ public class Fee {
     public long getAmount() { return amount; }
     public void setAmount(long amount) { this.amount = amount; }
 
+    public long getPenalty_amount() { return penalty_amount; }
+    public void setPenalty_amount(long penalty_amount) { this.penalty_amount = penalty_amount; }
+
+    public long getPaid_amount() { return paid_amount; }
+    public void setPaid_amount(long paid_amount) { this.paid_amount = paid_amount; }
+
     public String getDue_date() { return due_date; }
     public void setDue_date(String due_date) { this.due_date = due_date; }
+
+    public String getPaid_at() { return paid_at; }
+    public void setPaid_at(String paid_at) { this.paid_at = paid_at; }
+
+    public String getPayment_method() { return payment_method; }
+    public void setPayment_method(String payment_method) { this.payment_method = payment_method; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
