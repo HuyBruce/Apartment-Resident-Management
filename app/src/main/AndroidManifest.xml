@@ -8,12 +8,14 @@
         <activity android:name=".activities.AdminResidentsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminApartmentsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminApartmentDetailActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminHouseholdMemberFormActivity" android:exported="false"/>
         <activity android:name=".activities.AdminFeesActivity" android:exported="false"/>
         <activity android:name=".activities.AdminParkingActivity" android:exported="false"/>
         <activity android:name=".activities.AdminEventsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminFeedbackActivity" android:exported="false"/>
         <activity android:name=".activities.AdminVisitorsActivity" android:exported="false"/>
         <activity android:name=".activities.AdminNoticesActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminResidentFormActivity" android:exported="false"/>
         <activity android:name=".activities.AdminCreateNoticeActivity" android:exported="false"/>
         <activity android:name=".activities.AdminHomeActivity" android:exported="false"/>
         <activity android:name=".activities.AdminProfileActivity" android:exported="false"/>

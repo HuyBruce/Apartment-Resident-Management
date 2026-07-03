@@ -128,7 +128,7 @@ public class AdminRecordAdapter extends RecyclerView.Adapter<AdminRecordAdapter.
         if (normalizedAction.contains("nhắc")) {
             return dp(parent, 112);
         }
-        if (normalizedAction.contains("từ chối") || normalizedAction.contains("hủy")) {
+        if (normalizedAction.contains("từ chối") || normalizedAction.contains("hủy") || normalizedAction.contains("xóa")) {
             return dp(parent, 92);
         }
         if (normalizedAction.contains("chặn")) {
@@ -156,7 +156,7 @@ public class AdminRecordAdapter extends RecyclerView.Adapter<AdminRecordAdapter.
         if (normalizedAction.startsWith("xem")) {
             return 0xFF2F5F9E;
         }
-        if (normalizedAction.contains("nhắc") || normalizedAction.contains("từ chối") || normalizedAction.contains("hủy") || normalizedAction.startsWith("chặn")) {
+        if (normalizedAction.contains("nhắc") || normalizedAction.contains("từ chối") || normalizedAction.contains("hủy") || normalizedAction.contains("xóa") || normalizedAction.startsWith("chặn")) {
             return 0xFFD32F2F;
         }
         return 0xFF173B70;
@@ -175,7 +175,7 @@ public class AdminRecordAdapter extends RecyclerView.Adapter<AdminRecordAdapter.
         if (normalizedAction.startsWith("xem")) {
             return 0xFF2F5F9E;
         }
-        if (normalizedAction.contains("nhắc") || normalizedAction.contains("từ chối") || normalizedAction.contains("hủy") || normalizedAction.startsWith("chặn")) {
+        if (normalizedAction.contains("nhắc") || normalizedAction.contains("từ chối") || normalizedAction.contains("hủy") || normalizedAction.contains("xóa") || normalizedAction.startsWith("chặn")) {
             return 0xFFD32F2F;
         }
         return 0xFF173B70;
