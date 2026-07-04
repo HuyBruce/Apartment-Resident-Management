@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.activities;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
@@ -40,6 +41,7 @@ public class AdminFeedbackActivity extends BaseAdminListActivity {
 
     private static final String[] TYPE_FILTERS = new String[]{"Tất cả loại", "Yêu cầu", "Phản ánh"};
     private static final String[] STATUS_FILTERS = new String[]{"Tất cả", "Đang xử lý", "Hoàn thành", "Từ chối"};
+    private boolean hasResumedOnce = false;
 
     @Override
     protected int getLayoutResId() {
@@ -72,6 +74,16 @@ public class AdminFeedbackActivity extends BaseAdminListActivity {
         bindFilterViews();
         setupDropdownFilters();
         loadLookupData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasResumedOnce) {
+            loadLookupData();
+        } else {
+            hasResumedOnce = true;
+        }
     }
 
     @Override
@@ -302,7 +314,7 @@ public class AdminFeedbackActivity extends BaseAdminListActivity {
     @Override
     protected void onRecordAction(AdminRecordAdapter.AdminRecord record, String action) {
         if ("Phản hồi".equals(action)) {
-            showResponseDialog(record);
+            openResponsePage(record);
         } else if ("Hoàn thành".equals(action)) {
             updateStatus(record, "done", "Đã đánh dấu hoàn thành");
         } else if ("Từ chối".equals(action)) {
@@ -310,42 +322,18 @@ public class AdminFeedbackActivity extends BaseAdminListActivity {
         }
     }
 
-    private void showResponseDialog(AdminRecordAdapter.AdminRecord record) {
-        EditText input = new EditText(this);
-        input.setHint("Nhập nội dung phản hồi cho cư dân");
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        input.setMinLines(3);
-        input.setPadding(dp(20), 0, dp(20), 0);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Phản hồi")
-                .setView(input)
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Lưu", null)
-                .create();
-        dialog.setOnShowListener(d -> dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String response = input.getText().toString().trim();
-            if (response.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập nội dung phản hồi", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("admin_response", response);
-            updates.put("status", "responded");
-            updates.put("responded_at", now());
-            updates.put("updated_at", now());
-            String collection = record.extras.get("source_collection");
-            String oldStatus = record.extras.get("raw_status");
-            db.collection(collection).document(record.documentId).update(updates)
-                    .addOnSuccessListener(unused -> {
-                        createHistory(record, oldStatus, "responded", "Admin phản hồi: " + response);
-                        Toast.makeText(this, "Đã phản hồi", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                        loadData();
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi lưu phản hồi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-        }));
-        dialog.show();
+    private void openResponsePage(AdminRecordAdapter.AdminRecord record) {
+        Intent intent = new Intent(this, AdminFeedbackResponseActivity.class);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_COLLECTION, record.extras.get("source_collection"));
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_DOCUMENT_ID, record.documentId);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_REQUEST_ID, record.extras.get("request_id"));
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_OLD_STATUS, record.extras.get("raw_status"));
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_TITLE, record.title);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_SUBTITLE, record.subtitle);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_BODY, record.body);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_STATUS, record.status);
+        intent.putExtra(AdminFeedbackResponseActivity.EXTRA_TYPE_LABEL, record.extras.get("type_label"));
+        startActivity(intent);
     }
 
     private void showRejectDialog(AdminRecordAdapter.AdminRecord record) {

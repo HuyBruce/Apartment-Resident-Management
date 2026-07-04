@@ -192,7 +192,7 @@ public class AdminResidentFormActivity extends AppCompatActivity {
         String email = value(edtEmail.getText().toString());
         String dateOfBirth = value(edtDateOfBirth.getText().toString());
         String identity = value(edtIdentity.getText().toString());
-        String membersCount = value(edtMembersCount.getText().toString());
+        String membersCountInput = value(edtMembersCount.getText().toString());
         String gender = String.valueOf(spnGender.getSelectedItem());
         String relationshipValue = RELATION_OWNER;
 
@@ -206,9 +206,10 @@ public class AdminResidentFormActivity extends AppCompatActivity {
             return;
         }
 
-        if (membersCount.isEmpty()) {
-            membersCount = "1";
+        if (membersCountInput.isEmpty()) {
+            membersCountInput = "1";
         }
+        final String membersCount = membersCountInput;
 
         if (apartments.isEmpty()) {
             toast("Chưa có căn hộ để gán chủ hộ");
@@ -216,11 +217,103 @@ public class AdminResidentFormActivity extends AppCompatActivity {
         }
 
         ApartmentOption selectedApartment = apartments.get(Math.max(0, spnApartment.getSelectedItemPosition()));
-        if (isEdit) {
-            updateResident(residentId, fullName, phone, email, dateOfBirth, identity, membersCount, gender, relationshipValue, selectedApartment);
-        } else {
-            createResident(residentId, fullName, phone, email, dateOfBirth, identity, membersCount, gender, relationshipValue, selectedApartment);
+        checkApartmentOwnerAvailable(residentId, selectedApartment, () -> {
+            if (isEdit) {
+                updateResident(residentId, fullName, phone, email, dateOfBirth, identity, membersCount, gender, relationshipValue, selectedApartment);
+            } else {
+                createResident(residentId, fullName, phone, email, dateOfBirth, identity, membersCount, gender, relationshipValue, selectedApartment);
+            }
+        });
+    }
+
+    private void checkApartmentOwnerAvailable(String residentId, ApartmentOption apartment, Runnable onAvailable) {
+        setLoading(true);
+        List<DocumentSnapshot> matchedResidents = new ArrayList<>();
+        Object apartmentValue = apartmentIdValue(apartment.id);
+
+        db.collection("residents")
+                .whereEqualTo("apartment_id", apartmentValue)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    matchedResidents.addAll(snapshot.getDocuments());
+                    if (apartmentValue instanceof Number) {
+                        checkApartmentOwnerByStringId(residentId, apartment, matchedResidents, onAvailable);
+                    } else {
+                        checkApartmentOwnerByApartmentNumber(residentId, apartment, matchedResidents, onAvailable);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    toast("Lỗi kiểm tra chủ hộ của căn hộ: " + e.getMessage());
+                });
+    }
+
+    private void checkApartmentOwnerByStringId(String residentId, ApartmentOption apartment,
+                                               List<DocumentSnapshot> matchedResidents, Runnable onAvailable) {
+        db.collection("residents")
+                .whereEqualTo("apartment_id", apartment.id)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    matchedResidents.addAll(snapshot.getDocuments());
+                    checkApartmentOwnerByApartmentNumber(residentId, apartment, matchedResidents, onAvailable);
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    toast("Lỗi kiểm tra chủ hộ của căn hộ: " + e.getMessage());
+                });
+    }
+
+    private void checkApartmentOwnerByApartmentNumber(String residentId, ApartmentOption apartment,
+                                                      List<DocumentSnapshot> matchedResidents, Runnable onAvailable) {
+        if (apartment.code == null || apartment.code.trim().isEmpty()) {
+            finishApartmentOwnerCheck(residentId, apartment, matchedResidents, onAvailable);
+            return;
         }
+
+        db.collection("residents")
+                .whereEqualTo("apartment_number", apartment.code)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    matchedResidents.addAll(snapshot.getDocuments());
+                    finishApartmentOwnerCheck(residentId, apartment, matchedResidents, onAvailable);
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    toast("Lỗi kiểm tra chủ hộ của căn hộ: " + e.getMessage());
+                });
+    }
+
+    private void finishApartmentOwnerCheck(String residentId, ApartmentOption apartment,
+                                           List<DocumentSnapshot> matchedResidents, Runnable onAvailable) {
+        for (DocumentSnapshot doc : matchedResidents) {
+            if (!isCurrentEditingResident(doc, residentId)) {
+                String ownerName = firstNonEmpty(string(doc, "full_name"), "chủ hộ hiện tại");
+                setLoading(false);
+                toast("Căn hộ " + apartment.code + " đã có chủ hộ: " + ownerName + ". Vui lòng chọn căn hộ khác.");
+                return;
+            }
+        }
+
+        onAvailable.run();
+    }
+
+    private boolean isCurrentEditingResident(DocumentSnapshot doc, String newResidentId) {
+        if (!isEdit) return false;
+
+        String currentDocumentId = firstNonEmpty(documentId, oldResidentId, newResidentId);
+        String existingDocumentId = value(doc.getId());
+        String existingResidentId = firstNonEmpty(string(doc, "resident_id"), string(doc, "id"), existingDocumentId);
+
+        return sameId(existingDocumentId, currentDocumentId)
+                || sameId(existingDocumentId, oldResidentId)
+                || sameId(existingDocumentId, newResidentId)
+                || sameId(existingResidentId, currentDocumentId)
+                || sameId(existingResidentId, oldResidentId)
+                || sameId(existingResidentId, newResidentId);
+    }
+
+    private boolean sameId(String left, String right) {
+        return value(left).equalsIgnoreCase(value(right));
     }
 
     private void createResident(String residentId, String fullName, String phone, String email, String dateOfBirth,

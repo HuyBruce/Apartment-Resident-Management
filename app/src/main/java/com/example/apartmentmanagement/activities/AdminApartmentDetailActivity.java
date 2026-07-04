@@ -1,9 +1,7 @@
 package com.example.apartmentmanagement.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -74,7 +72,6 @@ public class AdminApartmentDetailActivity extends AppCompatActivity {
 
     private void bindViews() {
         ImageButton backButton = findViewById(R.id.btnBackApartmentDetail);
-        Button btnAddMember = findViewById(R.id.btnAddHouseholdMember);
         titleView = findViewById(R.id.tvApartmentDetailTitle);
         subtitleView = findViewById(R.id.tvApartmentDetailSubtitle);
         apartmentCodeView = findViewById(R.id.tvApartmentCode);
@@ -82,26 +79,9 @@ public class AdminApartmentDetailActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressApartmentDetail);
 
         backButton.setOnClickListener(v -> finish());
-        btnAddMember.setOnClickListener(v -> openAddMemberPage());
-
         residentsAdapter = setupRecycler(R.id.recyclerApartmentResidents);
         membersAdapter = setupRecycler(R.id.recyclerHouseholdMembers);
         feesAdapter = setupRecycler(R.id.recyclerApartmentFees);
-    }
-
-    private void openAddMemberPage() {
-        if (apartmentId == null || apartmentId.trim().isEmpty()) {
-            Toast.makeText(this, "Thiếu apartment_id để thêm thành viên", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent(this, AdminHouseholdMemberFormActivity.class);
-        intent.putExtra(AdminHouseholdMemberFormActivity.EXTRA_APARTMENT_ID, apartmentId);
-        intent.putExtra(AdminHouseholdMemberFormActivity.EXTRA_APARTMENT_CODE, apartmentCode);
-        intent.putExtra(AdminHouseholdMemberFormActivity.EXTRA_BUILDING, building);
-        intent.putExtra(AdminHouseholdMemberFormActivity.EXTRA_FLOOR, floor);
-        intent.putExtra(AdminHouseholdMemberFormActivity.EXTRA_OWNER_RESIDENT_ID, firstNonEmpty(ownerResidentId));
-        startActivity(intent);
     }
 
     private AdminRecordAdapter setupRecycler(int recyclerId) {

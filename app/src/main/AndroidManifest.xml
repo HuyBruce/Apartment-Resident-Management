@@ -20,6 +20,8 @@
         <activity android:name=".activities.AdminHomeActivity" android:exported="false"/>
         <activity android:name=".activities.AdminProfileActivity" android:exported="false"/>
         <activity android:name=".activities.FeeActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminEventFormActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminFeedbackResponseActivity" android:exported="false"/>
         <activity android:name=".activities.LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

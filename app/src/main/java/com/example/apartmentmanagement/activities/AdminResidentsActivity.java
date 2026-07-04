@@ -44,6 +44,41 @@ public class AdminResidentsActivity extends BaseAdminListActivity {
     }
 
     @Override
+    protected String[] getFilters() {
+        return new String[]{"Tất cả", "Block A", "Block B"};
+    }
+
+    @Override
+    protected boolean shouldDisplayDocument(DocumentSnapshot doc) {
+        String selectedFilter = getSelectedFilter();
+        if ("Tất cả".equalsIgnoreCase(selectedFilter)) {
+            return true;
+        }
+
+        String apartmentNumber = firstNonEmpty(
+                string(doc, "apartment_number"),
+                string(doc, "apartment_code"),
+                string(doc, "room_number")
+        ).toUpperCase(Locale.ROOT);
+
+        String building = firstNonEmpty(
+                string(doc, "building"),
+                string(doc, "block"),
+                string(doc, "building_name")
+        ).toUpperCase(Locale.ROOT);
+
+        if ("Block A".equalsIgnoreCase(selectedFilter)) {
+            return building.contains("A") || apartmentNumber.startsWith("A");
+        }
+
+        if ("Block B".equalsIgnoreCase(selectedFilter)) {
+            return building.contains("B") || apartmentNumber.startsWith("B");
+        }
+
+        return true;
+    }
+
+    @Override
     protected void onAfterBaseViewsBound() {
         if (fab != null) {
             fab.setIconResource(R.drawable.ic_user_plus);

@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.activities;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
@@ -34,6 +35,7 @@ public class AdminEventsActivity extends BaseAdminListActivity {
     private final Map<String, String> residentNames = new HashMap<>();
     private final Map<String, String> apartmentCodes = new HashMap<>();
     private final Set<String> completedSyncedDocumentIds = new HashSet<>();
+    private boolean shouldReloadAfterForm = false;
 
     @Override
     protected int getLayoutResId() {
@@ -79,7 +81,16 @@ public class AdminEventsActivity extends BaseAdminListActivity {
 
     @Override
     protected void onFabClick() {
-        showEventDialog(null, null);
+        openEventForm(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (shouldReloadAfterForm) {
+            shouldReloadAfterForm = false;
+            loadLookupData();
+        }
     }
 
     private void loadLookupData() {
@@ -269,12 +280,24 @@ public class AdminEventsActivity extends BaseAdminListActivity {
     @Override
     protected void onRecordAction(AdminRecordAdapter.AdminRecord record, String action) {
         if ("Sửa".equals(action)) {
-            openEditDialog(record.documentId);
+            openEventForm(record.documentId);
         } else if ("Hủy".equals(action)) {
             showCancelDialog(record.documentId);
         } else if ("DS đăng ký".equals(action)) {
             showRegistrationList(record.extras.get("event_id"), record.title);
         }
+    }
+
+    private void openEventForm(String documentId) {
+        Intent intent = new Intent(this, AdminEventFormActivity.class);
+        if (documentId == null || documentId.trim().isEmpty()) {
+            intent.putExtra(AdminEventFormActivity.EXTRA_MODE, AdminEventFormActivity.MODE_ADD);
+        } else {
+            intent.putExtra(AdminEventFormActivity.EXTRA_MODE, AdminEventFormActivity.MODE_EDIT);
+            intent.putExtra(AdminEventFormActivity.EXTRA_DOCUMENT_ID, documentId);
+        }
+        shouldReloadAfterForm = true;
+        startActivity(intent);
     }
 
     private void openEditDialog(String documentId) {
